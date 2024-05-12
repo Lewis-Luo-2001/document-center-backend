@@ -18,15 +18,15 @@ router.get('/names', authenticator.getUserInfo, (req, res) => {
   res.send(files);
 });
 
-/* GET user's file */
-// This route is used to download the file that the user has uploaded.
+/* GET user's image */
+// This route is used to download the image that the user has uploaded.
 //
 // Request Authentication
 // Bearer token: jwt
 //
 // Request route parameters
 // name: The name of the file to download
-router.get('/file/:name', authenticator.getUserInfo, (req, res) => {
+router.get('/:name', authenticator.getUserInfo, (req, res) => {
   const filePath = 'static/' + req.email + '/' + req.params.name;
   if(!fs.existsSync(filePath)) {
     res.sendStatus(404).send('File not found');
