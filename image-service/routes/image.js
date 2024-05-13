@@ -38,23 +38,21 @@ router.get('/ids', authenticator.getUserInfo, (req, res) => {
   res.send(files);
 });
 
-/* GET user's image */
-// This route is used to download the image that the user has uploaded.
-//
-// Request Authentication
-// Bearer token: jwt
-//
-// Request route parameters
-// name: The name of the file to download
-
 /**
  * @swagger
- * /:id:
+ * /get/:id:
  *   get:
  *     summary: This route is used to download the image that the user has uploaded.
  *     description: Will download the image with the given id.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the item to get
+ *         schema:
+ *           type: string
  *     security:
- *      - bearerAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       '200':
  *         content:
@@ -74,31 +72,36 @@ router.get('/ids', authenticator.getUserInfo, (req, res) => {
  *       '404':
  *         description: User not found
  */
-router.get('/:id', authenticator.getUserInfo, (req, res) => {
-  const filePath = 'static/' + req.email + '/' + req.params.name;
+router.get('/get/:id', authenticator.getUserInfo, (req, res) => {
+  const filePath = 'static/' + req.email + '/' + req.params.id;
   if(!fs.existsSync(filePath)) {
-    res.sendStatus(404).send('File not found');
+    res.status(404).send('File not found');
   }
-  res.download(filePath);
+  else {
+    res.download(filePath);
+  }
 });
-
-/* POST upload image */
-// This route is used to upload an image.
-//
-// Request Authentication
-// Bearer token: jwt
-//
-// Request body:
-// file: The image file to upload, must be in PNG or JPEG format
 
 /**
  * @swagger
  * /:
  *   post:
  *     summary: This route is used to upload an image.
+ * 
  *     description: Will upload the image file.
+ * 
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
  *     security:
  *       - bearerAuth: []
+ * 
  *     responses:
  *       '200':
  *         content:
@@ -112,14 +115,19 @@ router.get('/:id', authenticator.getUserInfo, (req, res) => {
  * 
  *       '404':
  *         description: User not found
+ * 
+ *       '415':
+ *         description: Unsupported media type
  */
 router.post('/', authenticator.getUserInfo, imageSaver.single('file'), (req, res) => {
   const mimetype = fileManager.getMimeType(req.file.path);
   const validMimetype = ['image/png', 'image/jpeg'];
+
   if(!validMimetype.includes(mimetype)) {
-    res.sendStatus(415).send('Unsupported media type');
+    res.status(415).send('Unsupported media type');
+  } else {
+    res.status(200).send({id: req.file.filename});
   }
-  res.sendStatus(200);
 });
 
 module.exports = router;
