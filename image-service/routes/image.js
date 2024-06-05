@@ -57,9 +57,7 @@ router.post('/public', publicImageSaver.single('file'), (req, res) => {
 
     // Determine the base URL based on the request origin
     const host = req.headers.host;
-    const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1');
-    // const baseUrl = isLocalHost ? 'http://localhost:8082' : 'http://image-service:8082';
-    const baseUrl = 'http://localhost:8082';
+    const baseUrl = process.env.BASE_URL
 
     const fileUrl = `${baseUrl}/${urlPath}`;
     const mimetype = fileManager.getMimeType(filePath);

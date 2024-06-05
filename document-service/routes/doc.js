@@ -69,7 +69,10 @@ router.get('/all', authenticator.getInfoFromAuthService, async (req, res) => {
     let docs = [];
     for (const role of roles) {
       const doc = await dbHelper.findDocumentById(role.document);
-      docs.push(doc);
+      // ignore the duplicate docs
+      if (!docs.some(d => d.id === doc.id)) {
+        docs.push(doc);
+      }
     }
 
     // return the docname & id & status of all docs
@@ -283,8 +286,8 @@ router.put('/:id', authenticator.getInfoFromAuthService, async (req, res) => {
     // check if the document is exist
     if (!document) return res.status(404).send('Document not found');
 
-    // only the owner can update the document
-    if (document.creator !== user.account) {
+    // only the owner and the admin can update the document
+    if (document.creator !== user.account && user.manager !== true) {
       return res.status(401).send('Unauthorized');
     }
 
