@@ -1,3 +1,4 @@
+#!/bin/bash
 docker build --platform linux/amd64 -t gcp-frontend .
 # docker run --cap-add SYS_ADMIN --device /dev/fuse -it -p 80:8080 gcp-frontend
 

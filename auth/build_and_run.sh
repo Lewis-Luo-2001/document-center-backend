@@ -1,3 +1,4 @@
+#!/bin/bash
 docker build --platform linux/amd64 -t gcp-auth-service .
 # docker run -p 80:8080 gcp-auth-service
 
